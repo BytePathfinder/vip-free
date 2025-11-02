@@ -6,6 +6,8 @@ import tkinter as tk
 import webbrowser
 from tkinter import messagebox
 import re
+import sys
+import os
 try:
     from PIL import Image, ImageTk
     PIL_AVAILABLE = True
@@ -82,39 +84,52 @@ class VipVideoNavigation:
         # 收款二维码
         self.load_qr_code()
 
-        # 温馨提示文字
-        thank_you_label = tk.Label(self.root, text='感谢您的支持！✨', 
-                                  font=('Arial', 10, 'bold'), fg='green')
-        thank_you_label.place(x=180, y=550, width=140, height=20)
+        # 提示文字
         
-        support_label = tk.Label(self.root, text='如果觉得好用，欢迎打赏一瓶水~', 
-                                font=('Arial', 9))
-        support_label.place(x=130, y=550, width=240, height=20)
+        support_label = tk.Label(self.root, text='仅供学习参考，请于24小时内删除', fg='gray', font=('Arial', 13))
+        support_label.place(x=100, y=500, width=300, height=20)
 
 
     def load_qr_code(self):
         """加载二维码图片"""
         try:
+            # 获取程序运行时的绝对路径
+            if getattr(sys, 'frozen', False):
+                # 如果是打包后的exe文件
+                base_path = sys._MEIPASS
+            else:
+                # 如果是普通Python脚本
+                base_path = os.path.dirname(os.path.abspath(__file__))
+            
+            # 构建二维码图片的完整路径
+            qr_path = os.path.join(base_path, 'asset', 'qr_wechat.png')
+            print(f"尝试加载二维码图片: {qr_path}")
+            
             if PIL_AVAILABLE:
                 # 使用PIL加载图片，支持更多格式
-                image = Image.open('./asset/qr_wechat.png')
-                # 调整图片大小为150x150像素
+                image = Image.open(qr_path)
+                # 调整图片大小为250x250像素
                 image = image.resize((250, 250))
                 self.qr_code = ImageTk.PhotoImage(image)
             else:
                 # 如果没有PIL，则使用原始方式（仅支持GIF/PNG）
-                self.qr_code = tk.PhotoImage(file='./asset/qr_wechat.png')
+                self.qr_code = tk.PhotoImage(file=qr_path)
             
             # 将二维码放置在窗口中央下方
             qr_label = tk.Label(self.root, image=self.qr_code)
             qr_label.place(x=125, y=200, width=250, height=250)
             # 保持引用防止被垃圾回收
             qr_label.image = self.qr_code
+            print("二维码加载成功")
         except Exception as e:
-            # 如果图片加载失败，显示提示文字
-            qr_error_label = tk.Label(self.root, text='二维码加载失败', fg='gray')
-            qr_error_label.place(x=15, y=200, width=250, height=250)
+            # 如果图片加载失败，显示提示文字和错误信息
+            error_msg = f'二维码加载失败: {str(e)}'
+            qr_error_label = tk.Label(self.root, text=error_msg, fg='red', 
+                                    wraplength=240, justify='center')
+            qr_error_label.place(x=125, y=200, width=250, height=250)
             print(f"二维码加载失败: {e}")
+            print(f"当前工作目录: {os.getcwd()}")
+            print(f"尝试加载的路径: {qr_path if 'qr_path' in locals() else '未知'}")
 
 
     def select_parse(self):
