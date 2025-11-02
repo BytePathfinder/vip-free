@@ -39,6 +39,13 @@ android.sdk = 31
 # (str) Android NDK version to use
 android.ndk = 23b
 
+# (bool) If True, then skip trying to update the Android SDK
+# This can be useful to avoid excess Internet downloads or save time
+android.skip_update = True
+
+# (str) The Android SDK directory to use
+android.sdk_path = $HOME/android-sdk
+
 # (list) The Android archs to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 android.archs = arm64-v8a, armeabi-v7a
 
