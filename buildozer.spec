@@ -48,10 +48,10 @@ android.accept_sdk_license = True
 android.sdk_path = /home/runner/android-sdk
 
 # (str) Android NDK version to use
-android.ndk_version = 21.4.7075529
+android.ndk_version = 25.2.9519653
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
-android.ndk_path = /home/runner/android-sdk/ndk/21.4.7075529
+android.ndk_path = /home/runner/android-sdk/ndk/25.2.9519653
 
 # (list) The Android archs to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 android.archs = arm64-v8a, armeabi-v7a

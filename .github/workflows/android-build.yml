@@ -59,7 +59,7 @@ jobs:
         
         # 接受许可并安装必要的SDK组件
         yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
-        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "tools" "build-tools;31.0.0" "platform-tools" "platforms;android-31" "ndk;21.4.7075529"
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "tools" "build-tools;31.0.0" "platform-tools" "platforms;android-31" "ndk;25.2.9519653"
         # 再次设置环境变量确保生效
         echo "ANDROID_SDK_ROOT=$ANDROID_SDK_PATH" >> $GITHUB_ENV
         echo "$ANDROID_SDK_PATH/cmdline-tools/latest/bin" >> $GITHUB_PATH
@@ -75,6 +75,7 @@ jobs:
         echo "Checking SDK and NDK installation..."
         ls -la /home/runner/android-sdk/
         ls -la /home/runner/android-sdk/ndk/ 2>/dev/null || echo "NDK directory not found"
+        ls -la /home/runner/android-sdk/ndk/25.2.9519653/ 2>/dev/null || echo "NDK 25.2.9519653 not found"
         
         # 打印Java版本验证
         java -version
@@ -82,7 +83,7 @@ jobs:
         # 增加构建超时时间并设置更多调试选项
         export P4A_TARGET_API=31
         export P4A_SDK_API=31
-        export P4A_NDK_API=21
+        export P4A_NDK_API=21  # Keep API level 21 for compatibility with older devices
         
         # 构建APK，使用详细日志和错误处理
         buildozer android debug --verbose --ignore-setup-errors --log-level=debug
