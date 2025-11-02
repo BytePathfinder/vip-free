@@ -127,6 +127,10 @@ warn_on_root = 1
 # (str) Filename to the hook for p4a
 # p4a.hook = 
 
+# (list) Apply patches to build recipes
+# Example: patches = my_dir/patch1.patch,my_dir/patch2.patch
+patches = patches/fix-setup.patch
+
 # (str) Bootstrap to use for android builds
 # p4a.bootstrap = sdl2
 
