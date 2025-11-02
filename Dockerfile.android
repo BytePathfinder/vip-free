@@ -58,7 +58,8 @@ WORKDIR /app
 COPY . /app/
 
 # 安装Python依赖
-RUN pip3 install -r android_requirements.txt
+RUN pip3 install cython && \
+    pip3 install -r android_requirements.txt
 
 # 创建构建脚本
 RUN echo '#!/bin/bash\n\
