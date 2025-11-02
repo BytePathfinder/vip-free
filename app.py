@@ -12,7 +12,7 @@ class VipVideoNavigation:
     def __init__(self, root):
         self.root = root
         self.root.title('VIP追剧神器')
-        self.root.geometry('500x200')
+        self.root.geometry('500x230')  # 增加窗口高度以容纳提示信息
         self.root.resizable(False, False)  # 锁定窗口尺寸
         self.create_widgets()
 
@@ -49,12 +49,15 @@ class VipVideoNavigation:
         parse_label = tk.Label(self.root, text='解析接口：')
         parse_label.place(x=20, y=100, width=100, height=30)
         
-        self.parse_var = tk.StringVar(value="接口1")
+        self.parse_var = tk.StringVar()
         parse_options = [
             ("接口1", "https://jx.xmflv.cc/?url="),
             ("接口2", "https://jx.m3u8.tv/jiexi/?url="),
             ("接口3", "https://www.yemu.xyz/?url="),
         ]
+        
+        # 设置默认选中接口1
+        self.parse_var.set("https://jx.xmflv.cc/?url=")
         
         x_offset = 125
         for i, (text, url) in enumerate(parse_options):
@@ -65,6 +68,11 @@ class VipVideoNavigation:
             # 如果一行放不下，可以考虑换行显示
             if x_offset > 450 and i < len(parse_options) - 1:
                 x_offset = 125
+
+        # 安全提示标签
+        tip_label = tk.Label(self.root, text='请勿相信播放页面的广告，保护好自己的钱袋子。', 
+                            fg='red', font=('Arial', 9))
+        tip_label.place(x=20, y=140, width=460, height=30)
 
     def select_parse(self):
         # 选择解析接口
