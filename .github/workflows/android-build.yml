@@ -34,25 +34,42 @@ jobs:
         ANDROID_SDK_PATH="/home/runner/android-sdk"
         mkdir -p $ANDROID_SDK_PATH
         cd $ANDROID_SDK_PATH
+        # 下载并安装命令行工具
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
-        unzip commandlinetools-linux-8512546_latest.zip
+        unzip -q commandlinetools-linux-8512546_latest.zip
+        # 修复目录结构
         mkdir -p cmdline-tools/latest
-        mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
+        mv cmdline-tools/bin cmdline-tools/lib cmdline-tools/NOTICE.txt cmdline-tools/source.properties cmdline-tools/latest/ 2>/dev/null || true
+        # 创建必要的目录
+        mkdir -p $ANDROID_SDK_PATH/build-tools
+        mkdir -p $ANDROID_SDK_PATH/platform-tools
+        mkdir -p $ANDROID_SDK_PATH/platforms
         # 设置环境变量
         export ANDROID_SDK_ROOT=$ANDROID_SDK_PATH
         export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+        # 打印路径验证
+        echo "SDK Path: $ANDROID_SDK_PATH"
+        ls -la $ANDROID_SDK_PATH/cmdline-tools/latest/
         # 接受许可并安装必要的SDK组件
         yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
-        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;31.0.0" "platform-tools" "platforms;android-31"
-        # 设置构建环境变量
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "tools" "build-tools;31.0.0" "platform-tools" "platforms;android-31" "ndk;21.4.7075529"
+        # 再次设置环境变量确保生效
         echo "ANDROID_SDK_ROOT=$ANDROID_SDK_PATH" >> $GITHUB_ENV
         echo "$ANDROID_SDK_PATH/cmdline-tools/latest/bin" >> $GITHUB_PATH
         echo "$ANDROID_SDK_PATH/platform-tools" >> $GITHUB_PATH
         
     - name: Build APK
       run: |
-        # 构建APK，使用verbose模式和忽略设置错误选项
-        buildozer android debug --verbose --ignore-setup-errors
+        # 检查SDK和NDK路径
+        echo "Checking SDK and NDK installation..."
+        ls -la /home/runner/android-sdk/
+        ls -la /home/runner/android-sdk/ndk/ 2>/dev/null || echo "NDK directory not found"
+        # 增加构建超时时间并设置更多调试选项
+        export P4A_TARGET_API=31
+        export P4A_SDK_API=31
+        export P4A_NDK_API=21
+        # 构建APK，使用详细日志和错误处理
+        buildozer android debug --verbose --ignore-setup-errors --log-level=debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4

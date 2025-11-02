@@ -42,9 +42,16 @@ android.ndk = 23b
 # (bool) If True, then skip trying to update the Android SDK
 # This can be useful to avoid excess Internet downloads or save time
 android.skip_update = True
+android.accept_sdk_license = True
 
 # (str) The Android SDK directory to use
 android.sdk_path = /home/runner/android-sdk
+
+# (str) Android NDK version to use
+android.ndk_version = 21.4.7075529
+
+# (str) Android NDK directory (if empty, it will be automatically downloaded.)
+android.ndk_path = /home/runner/android-sdk/ndk/21.4.7075529
 
 # (list) The Android archs to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 android.archs = arm64-v8a, armeabi-v7a
