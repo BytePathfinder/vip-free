@@ -15,6 +15,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.core.text import LabelBase
@@ -268,7 +269,7 @@ class VipVideoApp(App):
         main_layout.add_widget(search_card)
         
         # 网址输入区域
-        url_card = CardLayout(orientation='vertical', padding=dp(15), size_hint_y=None, height=dp(170))
+        url_card = CardLayout(orientation='vertical', padding=dp(15), size_hint_y=None, height=dp(240), background_color=(0.2, 0.2, 0.3, 1))  # 增加卡片高度以适应增大的文本域，并设置匹配的背景色
         
         # 网址输入标题
         url_label_config = {
@@ -286,24 +287,25 @@ class VipVideoApp(App):
         url_label = Label(**url_label_config)
         url_card.add_widget(url_label)
         
-        # 输入框（带圆角效果）
+        # 文本域（带圆角效果，多行输入）
         from kivy.uix.textinput import TextInput
         self.url_input = TextInput(
             text='',
-            multiline=False,
-            font_size=dp(14),
+            multiline=True,  # 改为多行文本域
+            font_size=dp(18),  # 进一步增大字体大小，提高可读性
             size_hint_y=None,
-            height=dp(50),
-            background_color=(0.2, 0.2, 0.3, 1),
-            foreground_color=(1, 1, 1, 1),
-            padding=[dp(10), dp(10)]
+            height=dp(120),  # 增加高度，适应多行输入和更大的字体
+            foreground_color=(1, 1, 1, 1),  # 纯白文字以获得最佳可读性
+            padding=[dp(15), dp(15)],  # 增加内边距，使文字更舒适
+            hint_text='请输入视频链接...',  # 添加提示文本
+            hint_text_color=(0.7, 0.7, 0.7, 1)  # 提高提示文本颜色亮度
         )
         if DEFAULT_FONT:
             self.url_input.font_name = DEFAULT_FONT
         
-        # 为输入框添加圆角
+        # 为文本域添加圆角
         with self.url_input.canvas.before:
-            Color(0.2, 0.2, 0.3, 1)
+            Color(0.25, 0.25, 0.35, 1)  # 使用比卡片稍深的背景色，形成微妙的层次感
             RoundedRectangle(pos=self.url_input.pos, size=self.url_input.size, radius=[10, 10, 10, 10])
         self.url_input.bind(pos=lambda *args: self.update_input_rect(self.url_input), 
                           size=lambda *args: self.update_input_rect(self.url_input))
@@ -364,10 +366,8 @@ class VipVideoApp(App):
         api_label = Label(**api_label_config)
         api_card.add_widget(api_label)
         
-        # 接口选择布局
-        self.api_group = BoxLayout(orientation='horizontal', spacing=dp(25), size_hint_y=None, height=dp(50))
-        
-        from kivy.uix.checkbox import CheckBox
+        # 接口选择布局 - 使用GridLayout确保均匀分布并居中对齐
+        self.api_group = GridLayout(cols=3, size_hint_y=None, height=dp(50), spacing=dp(10), padding=[dp(20), 0])
         
         # 自定义CheckBox样式
         class StyledCheckBox(CheckBox):
@@ -381,7 +381,7 @@ class VipVideoApp(App):
         self.api_radios = []
         
         for i in range(1, 4):
-            api_item_layout = BoxLayout(orientation='horizontal', spacing=dp(8), size_hint=(None, 1))
+            api_item_layout = BoxLayout(orientation='horizontal', spacing=dp(8), size_hint=(1, 1), pos_hint={'center_x': 0.5, 'center_y': 0.5})
             
             # 使用自定义CheckBox
             check_box = StyledCheckBox(group='api')
@@ -394,8 +394,9 @@ class VipVideoApp(App):
             radio_label_config = {
                 'text': f'接口{i}',
                 'font_size': dp(16),
-                'color': (0.9, 0.9, 0.9, 1),
-                'valign': 'middle'
+                'color': (1, 1, 1, 1),  # 使用更亮的文字颜色提高可读性
+                'valign': 'middle',
+                'halign': 'center'
             }
             if DEFAULT_FONT:
                 radio_label_config['font_name'] = DEFAULT_FONT
