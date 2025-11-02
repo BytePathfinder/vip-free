@@ -1,0 +1,85 @@
+# VIP追剧神器 - Android APK构建容器
+FROM ubuntu:20.04
+
+# 避免交互式配置
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV ANDROID_HOME=/opt/android-sdk
+ENV PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/platform-tools
+
+# 安装基础依赖
+RUN apt update && apt install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    openjdk-8-jdk \
+    git \
+    zip \
+    unzip \
+    wget \
+    curl \
+    software-properties-common \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    zlib1g-dev \
+    autoconf \
+    libtool \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装Android SDK命令行工具
+RUN mkdir -p $ANDROID_SDK_ROOT && \
+    cd $ANDROID_SDK_ROOT && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip && \
+    unzip commandlinetools-linux-8512546_latest.zip && \
+    rm commandlinetools-linux-8512546_latest.zip && \
+    mkdir -p cmdline-tools/latest && \
+    mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
+
+# 接受Android SDK许可
+RUN yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+# 安装必要的Android平台工具
+RUN $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+    "platform-tools" \
+    "platforms;android-30" \
+    "build-tools;30.0.3" \
+    "ndk;21.4.7075529"
+
+# 安装buildozer和Python依赖
+RUN pip3 install --upgrade pip && \
+    pip3 install buildozer python-for-android
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制项目文件
+COPY . /app/
+
+# 安装Python依赖
+RUN pip3 install -r android_requirements.txt
+
+# 创建构建脚本
+RUN echo '#!/bin/bash\n\
+echo "🔨 VIP追剧神器 - Android APK构建容器"\n\
+echo "📋 构建信息:"\n\
+echo "  - Python版本: $(python3 --version)"\n\
+echo "  - Java版本: $(java -version 2>&1 | head -n1)"\n\
+echo "  - Buildozer版本: $(buildozer --version)"\n\
+echo\n\
+if [ "$1" = "release" ]; then\n\
+    echo "🏗️  开始Release构建..."\n\
+    buildozer android release\n\
+else\n\
+    echo "🏗️  开始Debug构建..."\n\
+    buildozer android debug\n\
+fi\n\
+echo\n\
+echo "✅ 构建完成!"\n\
+echo "📱 APK文件位置:"\n\
+ls -la bin/*.apk 2>/dev/null || echo "未找到APK文件"\n\
+' > /build.sh && chmod +x /build.sh
+
+# 默认命令
+CMD ["/build.sh"]
