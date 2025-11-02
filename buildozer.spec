@@ -36,9 +36,6 @@ android.minapi = 21
 # (int) Android SDK version to use
 android.sdk = 31
 
-# (str) Android NDK version to use
-android.ndk = 23b
-
 # (bool) If True, then skip trying to update the Android SDK
 # This can be useful to avoid excess Internet downloads or save time
 android.skip_update = True
