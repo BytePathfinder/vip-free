@@ -1,37 +1,24 @@
 --- setup.py.orig	2024-01-01 00:00:00.000000000 +0000
 +++ setup.py	2024-01-01 00:00:00.000000000 +0000
-@@ -400,6 +400,12 @@
+@@ -1,4 +1,5 @@
+ import os
++import sys
+ import io
+ import re
+ import sysconfig
+@@ -390,6 +391,8 @@ def get_extension_modules():
          "src/libImaging/Quant.c",
          "src/libImaging/Resample.c",
      ]
-+    
-+    # Add Android platform specific flags
 +    if sys.platform == "android":
-+        extra_compile_args.append("-fPIC")
-+        extra_link_args.append("-fPIC")
-+
++        extra_compile_args.append("-fPIC"); extra_link_args.append("-fPIC")
+     
      if not CFLAGS:
          # TODO: remove when all warnings are fixed
-         CFLAGS = ["-Wno-unused-value", "-Wno-empty-body"]
-@@ -470,6 +476,10 @@
+@@ -460,6 +463,7 @@ def get_extension_modules():
              "-Wno-format-truncation",
          ]
      
-+    # Fix for Android NDK compatibility
-+    if sys.platform == "android":
-+        libraries = []
-+    
++    if sys.platform == "android": libraries = []
+     
      _add_imaging_libs(libs, include_dirs, library_dirs, libraries)
-     
-     if sys.platform == "darwin":
-@@ -500,6 +510,10 @@
-         ]
-     
-     if sys.platform == "win32":
-+        # Windows-specific handling
-+        pass
-+
-+    elif sys.platform == "android":
-         # Use standard malloc on non-Windows platforms
-         if _get_build_config().get("PNG", False):
-             libs.append("_imagingpng")
