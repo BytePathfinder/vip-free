@@ -30,6 +30,9 @@ jobs:
         sudo apt update
         sudo apt install -y python3-pip openjdk-8-jdk git zip unzip lib32stdc++6 lib32z1
         pip install buildozer
+        # Set JAVA_HOME to JDK 8 for Android SDK compatibility
+        export JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
+        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
         # 安装Android SDK工具
         ANDROID_SDK_PATH="/home/runner/android-sdk"
         mkdir -p $ANDROID_SDK_PATH
@@ -44,12 +47,16 @@ jobs:
         mkdir -p $ANDROID_SDK_PATH/build-tools
         mkdir -p $ANDROID_SDK_PATH/platform-tools
         mkdir -p $ANDROID_SDK_PATH/platforms
-        # 设置环境变量
+        # 设置环境变量，确保使用JDK 8
+        export JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
         export ANDROID_SDK_ROOT=$ANDROID_SDK_PATH
-        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
-        # 打印路径验证
+        export PATH=$JAVA_HOME/bin:$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+        
+        # 打印路径和Java版本验证
         echo "SDK Path: $ANDROID_SDK_PATH"
+        echo "Java version: $(java -version 2>&1)"
         ls -la $ANDROID_SDK_PATH/cmdline-tools/latest/
+        
         # 接受许可并安装必要的SDK组件
         yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
         $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "tools" "build-tools;31.0.0" "platform-tools" "platforms;android-31" "ndk;21.4.7075529"
@@ -60,14 +67,23 @@ jobs:
         
     - name: Build APK
       run: |
+        # 确保使用JDK 8
+        export JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
+        export PATH=$JAVA_HOME/bin:$PATH
+        
         # 检查SDK和NDK路径
         echo "Checking SDK and NDK installation..."
         ls -la /home/runner/android-sdk/
         ls -la /home/runner/android-sdk/ndk/ 2>/dev/null || echo "NDK directory not found"
+        
+        # 打印Java版本验证
+        java -version
+        
         # 增加构建超时时间并设置更多调试选项
         export P4A_TARGET_API=31
         export P4A_SDK_API=31
         export P4A_NDK_API=21
+        
         # 构建APK，使用详细日志和错误处理
         buildozer android debug --verbose --ignore-setup-errors --log-level=debug
         
