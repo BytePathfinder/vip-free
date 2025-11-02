@@ -8,7 +8,7 @@ from tkinter import messagebox
 import re
 
 
-class VIPVideoApp:
+class VipVideoNavigation:
     def __init__(self, root):
         self.root = root
         self.root.title('VIP追剧神器')
@@ -52,16 +52,19 @@ class VIPVideoApp:
         self.parse_var = tk.StringVar(value="接口1")
         parse_options = [
             ("接口1", "https://jx.xmflv.cc/?url="),
-            ("接口2", "https://jx.bozrc.com:4433/player/?url="),
-            ("接口3", "https://jx.aidouer.net/?url=")
+            ("接口2", "https://jx.m3u8.tv/jiexi/?url="),
+            ("接口3", "https://www.yemu.xyz/?url="),
         ]
         
         x_offset = 125
-        for text, url in parse_options:
+        for i, (text, url) in enumerate(parse_options):
             radio = tk.Radiobutton(self.root, text=text, variable=self.parse_var, 
                                   value=url, command=self.select_parse)
-            radio.place(x=x_offset, y=100, width=80, height=30)
-            x_offset += 80
+            radio.place(x=x_offset, y=100, width=60, height=30)
+            x_offset += 65
+            # 如果一行放不下，可以考虑换行显示
+            if x_offset > 450 and i < len(parse_options) - 1:
+                x_offset = 125
 
     def select_parse(self):
         # 选择解析接口
@@ -103,5 +106,5 @@ class VIPVideoApp:
 
 if __name__ == '__main__':
     root = tk.Tk()
-    app = VIPVideoApp(root)
+    app = VipVideoNavigation(root)
     root.mainloop()
