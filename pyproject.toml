@@ -1,0 +1,7 @@
+[project]
+name = "vip-free"
+version = "0.1.0"
+description = "优爱腾视频解析工具"
+readme = "readme.md"
+requires-python = ">=3.12"
+dependencies = []
